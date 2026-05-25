@@ -27,7 +27,7 @@ https://api.github.com/repos/rousseauxy/tarbel-opendata/releases/tags/2026-05
 
 ## How it works
 
-A GitHub Actions workflow (`sync.yml`) runs daily at **01:05 UTC** (~03:05 CEST), about an hour after minfin publishes at 00:05 CEST:
+A GitHub Actions workflow (`sync.yml`) runs daily at **01:05 UTC** (03:05 CEST), about 3 hours after minfin publishes at 00:05 CEST:
 
 1. Fetches the list of assets already uploaded to this month's release
 2. Downloads only new files from the minfin portal (skips already-uploaded ones)
