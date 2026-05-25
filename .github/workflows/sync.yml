@@ -44,6 +44,12 @@ jobs:
           name: ${{ steps.tag.outputs.tag }}
           body: |
             Tarbel extractions from minfin for ${{ steps.tag.outputs.tag }}.
+
+            One full extraction on the 1st of the month + daily delta files.
             Downloaded automatically from https://eservices.minfin.fgov.be/extTariffBrowser/XmlExtractions
           files: downloads/*.zip
           fail_on_unmatched_files: false
+          # The script downloads all files available for the current month (full + deltas).
+          # overwrite=true makes daily re-runs idempotent: already-uploaded assets are replaced
+          # with identical content rather than causing a conflict.
+          overwrite: true
