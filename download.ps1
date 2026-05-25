@@ -11,8 +11,8 @@ param(
   [switch]$Debug
 )
 
-# Enable TLS 1.2 for secure connections
-[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+# TLS 1.2+ is the default on .NET Core / PowerShell 7 — no explicit override needed
+# [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 
 # Create output folder if it doesn't exist
 if (-not (Test-Path $OutputFolder))
