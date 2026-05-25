@@ -2,8 +2,8 @@ name: Sync Tarbel Extractions
 
 on:
   schedule:
-    # minfin publishes at ~00:05 CEST (= 22:05 UTC); run at 23:05 UTC (~01:05 CEST)
-    - cron: '5 23 * * *'
+    # minfin publishes at ~00:05 CEST; run at 01:05 UTC for a safe buffer
+    - cron: '5 1 * * *'
   workflow_dispatch:
     inputs:
       force:
