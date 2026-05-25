@@ -1,0 +1,49 @@
+name: Sync Tarbel Extractions
+
+on:
+  schedule:
+    # Run daily at 06:00 UTC — minfin publishes delta files nightly
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Re-download even if file already exists in the release'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write  # needed to create releases and upload assets
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download extractions from minfin
+        shell: pwsh
+        run: |
+          $force = '${{ github.event.inputs.force }}' -eq 'true'
+          $params = @{ OutputFolder = './downloads' }
+          if ($force) { $params['Force'] = $true }
+          ./download.ps1 @params
+
+      - name: List downloaded files
+        run: ls -lh downloads/ || echo "No files downloaded"
+
+      - name: Determine release tag (year-month)
+        id: tag
+        run: echo "tag=$(date -u +'%Y-%m')" >> "$GITHUB_OUTPUT"
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: ${{ steps.tag.outputs.tag }}
+          body: |
+            Tarbel extractions from minfin for ${{ steps.tag.outputs.tag }}.
+            Downloaded automatically from https://eservices.minfin.fgov.be/extTariffBrowser/XmlExtractions
+          files: downloads/*.zip
+          fail_on_unmatched_files: false
