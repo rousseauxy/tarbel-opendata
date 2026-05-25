@@ -2,8 +2,8 @@ name: Sync Tarbel Extractions
 
 on:
   schedule:
-    # Run daily at 06:00 UTC — minfin publishes delta files nightly
-    - cron: '0 6 * * *'
+    # minfin publishes at ~00:05 UTC daily; run at 01:00 UTC for a 55-minute buffer
+    - cron: '0 1 * * *'
   workflow_dispatch:
     inputs:
       force:
