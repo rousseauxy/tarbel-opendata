@@ -5,6 +5,7 @@
 param(
   [string]$BaseUrl = "https://eservices.minfin.fgov.be/extTariffBrowser",
   [string]$OutputFolder = ".\Downloads",
+  [string[]]$SkipFiles = @(),
   [switch]$DownloadDocumentation,
   [switch]$Force,
   [switch]$Debug
@@ -297,9 +298,14 @@ try
         
     Write-Host "`n  [$($link.Year)-$($link.Month)] $($link.FileName)" -ForegroundColor Cyan
         
-    if ((Test-Path $outputPath) -and -not $Force)
+    if (-not $Force -and ($SkipFiles -contains $link.FileName))
     {
-      Write-Host "    Already exists (use -Force to overwrite)" -ForegroundColor Yellow
+      Write-Host "    Already uploaded to release, skipping" -ForegroundColor Gray
+      $skipped++
+    }
+    elseif ((Test-Path $outputPath) -and -not $Force)
+    {
+      Write-Host "    Already exists locally (use -Force to overwrite)" -ForegroundColor Yellow
       $skipped++
     }
     else

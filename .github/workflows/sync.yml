@@ -22,12 +22,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Get already-uploaded release assets
+        id: existing
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag=$(date -u +'%Y-%m')
+          # List asset names already in this month's release; empty string if release doesn't exist yet
+          assets=$(gh release view "$tag" --json assets --jq '[.assets[].name] | join(",")' 2>/dev/null || echo "")
+          echo "assets=$assets" >> "$GITHUB_OUTPUT"
+          echo "Existing assets: $assets"
+
       - name: Download extractions from minfin
         shell: pwsh
         run: |
           $force = '${{ github.event.inputs.force }}' -eq 'true'
-          $params = @{ OutputFolder = './downloads' }
-          if ($force) { $params['Force'] = $true }
+          $skipFiles = ('${{ steps.existing.outputs.assets }}' -split ',' | Where-Object { $_ -ne '' })
+          $params = @{ OutputFolder = './downloads'; SkipFiles = $skipFiles }
+          if ($force) { $params['Force'] = $true; $params['SkipFiles'] = @() }
           ./download.ps1 @params
 
       - name: List downloaded files
@@ -49,7 +61,4 @@ jobs:
             Downloaded automatically from https://eservices.minfin.fgov.be/extTariffBrowser/XmlExtractions
           files: downloads/*.zip
           fail_on_unmatched_files: false
-          # The script downloads all files available for the current month (full + deltas).
-          # overwrite=true makes daily re-runs idempotent: already-uploaded assets are replaced
-          # with identical content rather than causing a conflict.
-          overwrite: true
+          # Only new files reach this step — existing assets were skipped during download.
