@@ -73,7 +73,7 @@ try
     {
       try
       {
-        $webClient.DownloadFile($docUrl, $docPath)
+        Invoke-WebRequest -Uri $docUrl -OutFile $docPath -UseBasicParsing -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" -ErrorAction Stop
         $fileSize = (Get-Item $docPath).Length / 1KB
         Write-Host "  Downloaded: $([math]::Round($fileSize, 2)) KB" -ForegroundColor Green
       }
