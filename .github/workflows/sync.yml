@@ -49,7 +49,7 @@ jobs:
           $alreadyHaveDoc = $skipFiles -contains 'XML-Document.zip'
           $force = '${{ github.event.inputs.force }}' -eq 'true'
           if (-not $alreadyHaveDoc -or $force) {
-            ./download.ps1 -DownloadDocumentation -OutputFolder './downloads' $(if ($force) { '-Force' })
+            ./download.ps1 -DownloadDocumentation -OutputFolder './downloads' -Force:$force
           } else {
             Write-Host "XML-Document.zip already in release, skipping."
           }
