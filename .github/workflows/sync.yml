@@ -2,8 +2,8 @@ name: Sync Tarbel Extractions
 
 on:
   schedule:
-    # Run at 01:05 Europe/Brussels (CEST = UTC+2) → 23:05 UTC previous day
-    - cron: '5 23 * * *'
+    # Run at 01:45 Brussels in summer (CEST=UTC+2) / 00:45 in winter (CET=UTC+1) → 23:45 UTC
+    - cron: '45 23 * * *'
   workflow_dispatch:
     inputs:
       force:
