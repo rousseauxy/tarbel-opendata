@@ -42,6 +42,18 @@ jobs:
           if ($force) { $params['Force'] = $true; $params['SkipFiles'] = @() }
           ./download.ps1 @params
 
+      - name: Download XML documentation
+        shell: pwsh
+        run: |
+          $skipFiles = ('${{ steps.existing.outputs.assets }}' -split ',')
+          $alreadyHaveDoc = $skipFiles -contains 'XML-Document.zip'
+          $force = '${{ github.event.inputs.force }}' -eq 'true'
+          if (-not $alreadyHaveDoc -or $force) {
+            ./download.ps1 -DownloadDocumentation -OutputFolder './downloads' $(if ($force) { '-Force' })
+          } else {
+            Write-Host "XML-Document.zip already in release, skipping."
+          }
+
       - name: List downloaded files
         run: ls -lh downloads/ || echo "No files downloaded"
 
