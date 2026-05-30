@@ -7,6 +7,7 @@ param(
   [string]$OutputFolder = ".\Downloads",
   [string[]]$SkipFiles = @(),
   [switch]$DownloadDocumentation,
+  [switch]$DownloadCurrencies,
   [switch]$Force,
   [switch]$Debug
 )
@@ -58,7 +59,7 @@ try
   $webClient = New-Object System.Net.WebClient
   $webClient.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
     
-  # Step 1: Download static XML documentation if requested
+  # Step 1a: Download static XML documentation if requested
   if ($DownloadDocumentation)
   {
     Write-Host "[1/1] Downloading XML documentation..." -ForegroundColor Cyan
@@ -75,6 +76,34 @@ try
       {
         Invoke-WebRequest -Uri $docUrl -OutFile $docPath -UseBasicParsing -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" -ErrorAction Stop
         $fileSize = (Get-Item $docPath).Length / 1KB
+        Write-Host "  Downloaded: $([math]::Round($fileSize, 2)) KB" -ForegroundColor Green
+      }
+      catch
+      {
+        Write-Host "  Failed: $($_.Exception.Message)" -ForegroundColor Red
+      }
+    }
+    Write-Host "`nComplete!" -ForegroundColor Green
+    return
+  }
+
+  # Step 1b: Download listed_currencies.xlsx if requested
+  if ($DownloadCurrencies)
+  {
+    Write-Host "[1/1] Downloading listed_currencies.xlsx..." -ForegroundColor Cyan
+    $xlsxUrl = "$BaseUrl/FileResourceForHomePageServlet?fname=listed_currencies.xlsx&lang=EN"
+    $xlsxPath = Join-Path $OutputFolder "listed_currencies.xlsx"
+
+    if ((Test-Path $xlsxPath) -and -not $Force)
+    {
+      Write-Host "  listed_currencies.xlsx already exists. Use -Force to overwrite." -ForegroundColor Yellow
+    }
+    else
+    {
+      try
+      {
+        Invoke-WebRequest -Uri $xlsxUrl -OutFile $xlsxPath -UseBasicParsing -UserAgent "Mozilla/5.0 (Windows NT 10.0; Win64; x64)" -ErrorAction Stop
+        $fileSize = (Get-Item $xlsxPath).Length / 1KB
         Write-Host "  Downloaded: $([math]::Round($fileSize, 2)) KB" -ForegroundColor Green
       }
       catch

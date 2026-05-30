@@ -54,6 +54,18 @@ jobs:
             Write-Host "XML-Document.zip already in release, skipping."
           }
 
+      - name: Download currency rates
+        shell: pwsh
+        run: |
+          $skipFiles = ('${{ steps.existing.outputs.assets }}' -split ',')
+          $alreadyHaveCurrencies = $skipFiles -contains 'listed_currencies.xlsx'
+          $force = '${{ github.event.inputs.force }}' -eq 'true'
+          if (-not $alreadyHaveCurrencies -or $force) {
+            ./download.ps1 -DownloadCurrencies -OutputFolder './downloads' -Force:$force
+          } else {
+            Write-Host "listed_currencies.xlsx already in release, skipping."
+          }
+
       - name: List downloaded files
         run: ls -lh downloads/ || echo "No files downloaded"
 
@@ -71,6 +83,8 @@ jobs:
 
             One full extraction on the 1st of the month + daily delta files.
             Downloaded automatically from https://eservices.minfin.fgov.be/extTariffBrowser/XmlExtractions
-          files: downloads/*.zip
+          files: |
+            downloads/*.zip
+            downloads/*.xlsx
           fail_on_unmatched_files: false
           # Only new files reach this step — existing assets were skipped during download.
